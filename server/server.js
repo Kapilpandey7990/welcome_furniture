@@ -5,12 +5,14 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const authRoutes = require('./routes/auth');
+const contactRoutes = require('./routes/contactForm'); // Added contact form route
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Add this line!
 app.use(cookieParser());
 
 // Configure session middleware
@@ -23,6 +25,8 @@ app.use(session({
 }));
 
 app.use('/auth', authRoutes);
+app.use('/contact', contactRoutes); // Use the contact form route
+
 // Serve static files from the root directory
 app.use(express.static(path.join(__dirname, '../')));
 
@@ -31,6 +35,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
 });
 
+// MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/auth-demo', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
