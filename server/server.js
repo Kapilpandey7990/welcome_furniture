@@ -40,4 +40,39 @@ mongoose.connect('mongodb://localhost:27017/auth-demo', { useNewUrlParser: true,
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+/* ------------------- Added Product API ------------------- */
+
+// Define Product Schema & Model
+const productSchema = new mongoose.Schema({
+    title: String,
+    price: Number,
+    image: String
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+// API to Get All Products
+app.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (err) {
+        res.status(500).send('Server Error');
+    }
+});
+
+// API to Add a New Product (Optional)
+app.post('/products', async (req, res) => {
+    try {
+        const { title, price, image } = req.body;
+        const newProduct = new Product({ title, price, image });
+        await newProduct.save();
+        res.status(201).json({ message: 'Product added successfully' });
+    } catch (err) {
+        res.status(500).send('Error adding product');
+    }
+});
+
+/* ------------------- Product API Ends ------------------- */
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
